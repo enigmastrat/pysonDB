@@ -53,11 +53,11 @@ class JsonDatabase:
 
         # backwards compatability
 
-    def _get_id(self) -> int:
-        return int(str(uuid.uuid4().int)[:18])
+    def _get_id(self) -> str:
+        return str(uuid.uuid4())
 
-    def _cast_id(self, pk) -> int:
-        return int(pk)
+    def _cast_id(self, pk) -> str:
+        return str(pk)
 
     def _get_load_function(self) -> Callable[..., Any]:
         return json.load
@@ -74,7 +74,7 @@ class JsonDatabase:
     def id_fieldname(self) -> str:
         return self._id_fieldname
 
-    def find(self, pk: int):
+    def find(self, pk: str):
         warnings.warn(DeprecationWarning("The find 'method' will be removed. Use 'getById' instead"), stacklevel=2)
         return self.getById(pk)
 
@@ -86,7 +86,7 @@ class JsonDatabase:
         warnings.warn(DeprecationWarning("The 'getBy' method will be removed. Use 'getByQuery' instead"), stacklevel=2)
         return self.getByQuery(query)
 
-    def add(self, new_data: Dict[str, Any]) -> int:
+    def add(self, new_data: Dict[str, Any]) -> str:
         with self.lock:
             with open(self.filename, "r+", encoding='utf-8') as db_file:
                 db_data = json.load(db_file)
@@ -177,7 +177,7 @@ class JsonDatabase:
             except:
                 return [{"": ""}]
 
-    def getById(self, pk: int) -> List[Dict[str, Any]]:
+    def getById(self, pk: str) -> List[Dict[str, Any]]:
         with self.lock:
             try:
                 with open(self.filename, "r", encoding='utf-8') as db_file:
@@ -225,7 +225,7 @@ class JsonDatabase:
 
         )
 
-    def updateById(self, pk: int, new_data: Dict[str, Any]) -> None:
+    def updateById(self, pk: str, new_data: Dict[str, Any]) -> None:
         updated = False
 
         with self.lock:
@@ -252,7 +252,7 @@ class JsonDatabase:
                         "new_keys: " + ",".join(sorted(new_data.keys())),
                     )
 
-    def deleteById(self, pk: int) -> bool:
+    def deleteById(self, pk: str) -> bool:
         with self.lock:
             with open(self.filename, "r+", encoding='utf-8') as db_file:
                 db_data = self._get_load_function()(db_file)
